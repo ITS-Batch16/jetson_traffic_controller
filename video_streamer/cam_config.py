@@ -64,7 +64,7 @@ class rpi:
     CAM_NAMES = IP_DICT.keys()
     
     @classmethod
-    def name_to_uri(cam_names,cls):
+    def name_to_uri(cls,cam_names):
         uri_list=[]
         for name in cam_names:
             uri="http://%s:%s%s"%( cls.IP_DICT[name], cls.STREAMING_PORT, cls.STREAM_LOCATION)
