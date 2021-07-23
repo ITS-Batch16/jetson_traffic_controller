@@ -95,6 +95,10 @@ class RPIstreamer:
                            self.http_responses]):
             frames = []
 
+            if self.stop_flag == 1:
+                for rsp in self.http_responses: rsp.close()
+                break
+
             for line in lines:
                 response = line.split(b'\r\n\r\n')
 
@@ -113,7 +117,7 @@ class RPIstreamer:
         return self.frames
 
     def close(self):
-        self.thread.join()
-        for rsp in self.http_responses: rsp.close()
+        self.stop_flag = 1
+        time.sleep(2)
         print('video streams closed for cameras %s'%self.cam_names.__str__()[1:-1])
 
