@@ -1,8 +1,6 @@
 import time, cv2
 import numpy as np
-from video_streamer.streaming import RTSPstreamer as streamer
-import video_streamer.cam_config as cfg
-
+from video_streamer.streaming import RPIstreamer as streamer
 
 '''Use each debug function to debug the system functionwise'''
 
@@ -10,7 +8,7 @@ import video_streamer.cam_config as cfg
 def stream_cameras():
     '''Debuggginf function for receiving Ras/pi streams'''
     CameraSet = streamer()
-    active_cameras = ['NORTH','NORTH','NORTH','NORTH']#length should be less than 4
+    active_cameras = ['NORTH','SOUTH','EAST','WEST']#length should be less than 4
     num_cameras = len(active_cameras)
     CameraSet.open(active_cameras )
 

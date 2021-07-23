@@ -60,7 +60,7 @@ class RTSPstreamer:
         print('video streams closed for cameras %s'%self.cam_names.__str__()[1:-1])
 
 
-class streamerRpi(threading.Thread):
+class RPIstreamer(threading.Thread):
     """
     Reads a live frame from  a given Rpi-camera and returns a frame whenever requested.
     """
