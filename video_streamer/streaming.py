@@ -71,7 +71,7 @@ class streamerRpi(threading.Thread):
         self.frames = None
         self.http_responses = None
         self.stop_flag = None
-        all_cam_names = cfg.ipcam.CAM_NAMES
+        all_cam_names = cfg.rpi.CAM_NAMES
         self.uri_dict = dict(zip(all_cam_names,cfg.rpi.name_to_uri(all_cam_names)))
 
         unreachable_cams = cfg.rpi.unreachable_cams(all_cam_names)
