@@ -5,14 +5,13 @@ from video_streamer.streaming import RPIstreamer as streamer
 '''Use each debug function to debug the system functionwise'''
 
 
-def stream_cameras():
+def stream_cameras(CameraSet, active_cameras):
     '''Debuggginf function for receiving Ras/pi streams'''
-    CameraSet = streamer()
-    active_cameras = ['NORTH','SOUTH','EAST','WEST']#length should be less than 4
+
     num_cameras = len(active_cameras)
     CameraSet.open(active_cameras )
 
-    SHOW_TIME = 600
+    SHOW_TIME = 60
     t0 = time.time()
     images = [None] * num_cameras
     img_shape = None
@@ -44,4 +43,6 @@ def stream_cameras():
 
 if __name__ == '__main__':
     '''Run the required debugging function below.'''
-    stream_cameras()
+    CameraSet = streamer()
+    stream_cameras(CameraSet,["NORTH","SOUTH"])
+    stream_cameras(CameraSet,["EAST","SOUTH","WEST"])
