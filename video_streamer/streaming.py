@@ -1,7 +1,7 @@
 import numpy as np
 import rtsp
 import utils.error_mngmnt as err
-import cam_config as cfg
+import video_streamer.cam_config as cfg
 import time
 import cv2 as cv
 import threading
@@ -16,9 +16,10 @@ class RTSPstreamer:
         """Constructor"""
         self.clients = None
         self.frame_timeout = 1
-        self.uri_dict = cfg.ipcam.URI_DICT
+        all_cam_names = cfg.ipcam.CAM_NAMES
+        self.uri_dict = dict(zip(all_cam_names,cfg.ipcam.name_to_uri(all_cam_names)))
 
-        unreachable_cams = cfg.ipcam.unreachable_cams(cfg.ipcam.CAM_NAMES)
+        unreachable_cams = cfg.ipcam.unreachable_cams(all_cam_names)
 
         if unreachable_cams != None:
             err.CameraNotFoundError(unreachable_cams)
@@ -70,10 +71,10 @@ class streamerRpi(threading.Thread):
         self.frames = None
         self.http_responses = None
         self.stop_flag = None
+        all_cam_names = cfg.ipcam.CAM_NAMES
+        self.uri_dict = dict(zip(all_cam_names,cfg.rpi.name_to_uri(all_cam_names)))
 
-        self.uri_dict = cfg.ipcam.URI_DICT
-
-        unreachable_cams = cfg.rpi.unreachable_cams(cfg.rpi.CAM_NAMES)
+        unreachable_cams = cfg.rpi.unreachable_cams(all_cam_names)
 
         if unreachable_cams != None:
             err.CameraNotFoundError(unreachable_cams)
