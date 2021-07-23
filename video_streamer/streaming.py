@@ -23,6 +23,7 @@ class RTSPstreamer:
 
         if unreachable_cams != None:
             err.CameraNotFoundError(unreachable_cams)
+        print("All cameras are connected")
 
     def open(self, Camera_Names):
         self.cam_names = Camera_Names
@@ -60,14 +61,13 @@ class RTSPstreamer:
         print('video streams closed for cameras %s'%self.cam_names.__str__()[1:-1])
 
 
-class RPIstreamer(threading.Thread):
+class RPIstreamer:
     """
     Reads a live frame from  a given Rpi-camera and returns a frame whenever requested.
     """
 
     def __init__(self):
         """Constructor"""
-        super(RPIstreamer, self).__init__()
         self.frames = None
         self.http_responses = None
         self.stop_flag = None
@@ -78,16 +78,19 @@ class RPIstreamer(threading.Thread):
 
         if unreachable_cams != None:
             err.CameraNotFoundError(unreachable_cams)
+        print("All cameras are connected")
 
     def open(self, Camera_Names):
         self.stop_flag = 0
         self.cam_names = Camera_Names
         self.frames = [None] * len(Camera_Names)
         self.http_responses = [requests.get(self.uri_dict[name], stream=True) for name in Camera_Names]
-        self.start()
+
+        self.thread = threading.Thread(target=self.thread_function)
+        self.thread.start()
         print('video streams opened for cameras %s'%Camera_Names.__str__()[1:-1])
 
-    def run(self):
+    def thread_function(self):
         for lines in zip(*[rsp.iter_lines(chunk_size=512, delimiter=b'--frame', decode_unicode=False) for rsp in
                            self.http_responses]):
 
