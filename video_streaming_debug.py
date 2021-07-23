@@ -46,3 +46,5 @@ if __name__ == '__main__':
     CameraSet = streamer()
     stream_cameras(CameraSet,["NORTH","SOUTH"])
     stream_cameras(CameraSet,["EAST","SOUTH","WEST"])
+    stream_cameras(CameraSet,["SOUTH"])
+    stream_cameras(CameraSet,["EAST","SOUTH","WEST","NORTH"])

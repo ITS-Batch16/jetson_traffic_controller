@@ -3,10 +3,10 @@ import sys
 
 class ipcam:
 
-    IP_DICT = { "NORTH" : "192.168.1.101",\
-            "EAST" : "192.168.1.102",\
-            "SOUTH" : "192.168.1.103",\
-            "WEST" : "192.168.1.104" }
+    IP_DICT = { "NORTH" : "192.168.1.64",\
+            "EAST" : "192.168.1.64",\
+            "SOUTH" : "192.168.1.64",\
+            "WEST" : "192.168.1.64" }
 
     CAMERA_USERNAME = "admin"
     CAMERA_PASSWORD = "#fyp1234"

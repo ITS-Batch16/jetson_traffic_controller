@@ -18,7 +18,7 @@ class RTSPstreamer:
         self.frame_timeout = 1
         all_cam_names = cfg.ipcam.CAM_NAMES
         self.uri_dict = dict(zip(all_cam_names,cfg.ipcam.name_to_uri(all_cam_names)))
-
+        print("Inspecting cameras")
         unreachable_cams = cfg.ipcam.unreachable_cams(all_cam_names)
 
         if unreachable_cams != None:
@@ -73,7 +73,7 @@ class RPIstreamer:
         self.stop_flag = None
         all_cam_names = cfg.rpi.CAM_NAMES
         self.uri_dict = dict(zip(all_cam_names,cfg.rpi.name_to_uri(all_cam_names)))
-
+        print("Inspecting cameras")
         unreachable_cams = cfg.rpi.unreachable_cams(all_cam_names)
 
         if unreachable_cams != None:
@@ -86,18 +86,13 @@ class RPIstreamer:
         self.frames = [None] * len(Camera_Names)
         self.http_responses = [requests.get(self.uri_dict[name], stream=True) for name in Camera_Names]
 
-        self.thread = threading.Thread(target=self.thread_function)
+        self.thread = threading.Thread(target=self.thread_function,daemon=True)
         self.thread.start()
         print('video streams opened for cameras %s'%Camera_Names.__str__()[1:-1])
 
     def thread_function(self):
         for lines in zip(*[rsp.iter_lines(chunk_size=512, delimiter=b'--frame', decode_unicode=False) for rsp in
                            self.http_responses]):
-
-            if self.stop_flag == 1:
-                for rsp in self.http_responses: rsp.close()
-                break
-
             frames = []
 
             for line in lines:
@@ -118,6 +113,7 @@ class RPIstreamer:
         return self.frames
 
     def close(self):
-        self.stop_flag = 1
+        self.thread.join()
+        for rsp in self.http_responses: rsp.close()
         print('video streams closed for cameras %s'%self.cam_names.__str__()[1:-1])
 
