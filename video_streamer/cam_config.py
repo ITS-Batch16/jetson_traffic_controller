@@ -39,7 +39,7 @@ class ipcam:
 
         unreachable_cam_list = []
         for name in cam_names:
-            ip = cls.CAMERA_IP_DICT[name]
+            ip = cls.IP_DICT[name]
             response = os.popen(f"ping {flag} {num_pckts} {ip}").read()
             search_results=[(keyword in response.lower()) for keyword in keywords]
             if any(search_results):
@@ -86,7 +86,7 @@ class rpi:
 
         unreachable_cam_list = []
         for name in cam_names:
-            ip = cls.RPI_IP_DICT[name]
+            ip = cls.IP_DICT[name]
             response = os.popen(f"ping {flag} {num_pckts} {ip}").read()
             search_results=[(keyword in response.lower()) for keyword in keywords]
             if any(search_results):
