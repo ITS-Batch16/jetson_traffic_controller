@@ -65,9 +65,9 @@ class RPIstreamer(threading.Thread):
     Reads a live frame from  a given Rpi-camera and returns a frame whenever requested.
     """
 
-    def __init__(self, Camera_Names):
+    def __init__(self):
         """Constructor"""
-        super(streamerRpi, self).__init__()
+        super(RPIstreamer, self).__init__()
         self.frames = None
         self.http_responses = None
         self.stop_flag = None
