@@ -4,10 +4,10 @@ import utils.error_mngmnt as err
 
 class ipcam:
 
-    IP_DICT = { "NORTH" : "192.168.1.64",\
-            "EAST" : "192.168.1.64",\
-            "SOUTH" : "192.168.1.64",\
-            "WEST" : "192.168.1.64" }
+    IP_DICT = { "COL" : "192.168.1.64",\
+            "MAH" : "192.168.1.64",\
+            "KES" : "192.168.1.64",\
+            "PIL" : "192.168.1.64" }
 
     CAMERA_USERNAME = "admin"
     CAMERA_PASSWORD = "#fyp1234"
@@ -67,10 +67,10 @@ class ipcam:
 
 class rpi:
 
-    IP_DICT = { "NORTH" : "192.168.1.101" ,\
-                "EAST" : "192.168.1.101",\
-                "SOUTH" : "192.168.1.101",\
-                "WEST" : "192.168.1.101" }
+    IP_DICT = { "COL" : "192.168.1.101" ,\
+                "MAH" : "192.168.1.101",\
+                "KES" : "192.168.1.101",\
+                "PIL" : "192.168.1.101" }
 
     STREAMING_PORT = 80
     STREAM_LOCATION= "/video_feed"

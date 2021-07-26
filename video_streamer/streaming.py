@@ -25,7 +25,7 @@ class RTSPstreamer:
         self.clients = [rtsp.Client(self.uri_dict[name]) for name in self.cam_names]
         print('video streams opened for cameras %s'%self.cam_names.__str__()[1:-1])
         
-    def get_frames(self):
+    def get_frames(self,ret_dict = False):
         """Returning the current frames when requested"""
         while(True):
             if self.clients is not None:
@@ -44,7 +44,8 @@ class RTSPstreamer:
 
             if not any(null_frames):
                 t0=time.time()
-                return frames
+                if ret_dict: return dict(zip(self.cam_names,frames))
+                else: return frames
       
             if time.time()-t0 > self.frame_timeout:
                 ret = np.array(self.cam_names)[null_frames].tolist()
@@ -52,7 +53,7 @@ class RTSPstreamer:
 
     def close(self):
         for client in self.clients:client.close()
-        time.sleep(2)
+        time.sleep(1)
         print('video streams closed for cameras %s'%self.cam_names.__str__()[1:-1])
 
 
@@ -105,12 +106,13 @@ class RPIstreamer:
             else:
                 self.frames = frames
 
-    def get_frames(self):
+    def get_frames(self,ret_dict = False):
         """Returning the current frames when requested"""
-        return self.frames
+        if ret_dict: return dict(zip(self.cam_names,self.frames))
+        else: return self.frames
 
     def close(self):
         self.stop_flag = 1
-        time.sleep(2)
+        time.sleep(1)
         print('video streams closed for cameras %s'%self.cam_names.__str__()[1:-1])
 
