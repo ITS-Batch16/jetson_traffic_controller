@@ -1,9 +1,0 @@
-GAMMA = 2.2
-LABELS = ['motorbike', 'three-wheeler', 'car', 'truck']
-W_NN_INPUT = 384
-H_NN_INPUT = 256
-# OBJ_THRESHOLD = 0.5
-# NMS_THRESHOLD = 0.3
-# ANCHORS = [0.57273, 0.677385, 1.87446, 2.06253,
-#                 3.33843, 5.47434, 7.88282, 3.52778, 9.77052, 9.16828]
-NUM_CLASSES = 4

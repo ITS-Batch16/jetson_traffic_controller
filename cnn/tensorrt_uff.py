@@ -4,7 +4,7 @@ import cv2
 import time
 from config import config
 
-from utils import draw_boxes
+from utils.utils import draw_boxes
 
 os.chdir(os.path.dirname(os.path.abspath(__file__)))
 
