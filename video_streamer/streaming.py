@@ -21,10 +21,9 @@ class RTSPstreamer:
             cfg.ipcam.cam_init()
         self.uri_dict = cfg.ipcam.URI_DICT
 
-    def open(self, Camera_Names):
-        self.cam_names = Camera_Names
-        self.clients = [rtsp.Client(self.uri_dict[name]) for name in Camera_Names]
-        print('video streams opened for cameras %s'%Camera_Names.__str__()[1:-1])
+    def open(self):
+        self.clients = [rtsp.Client(self.uri_dict[name]) for name in self.cam_names]
+        print('video streams opened for cameras %s'%self.cam_names.__str__()[1:-1])
         
     def get_frames(self):
         """Returning the current frames when requested"""

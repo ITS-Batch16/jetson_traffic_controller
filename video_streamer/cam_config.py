@@ -67,10 +67,10 @@ class ipcam:
 
 class rpi:
 
-    IP_DICT = { "NORTH" : "192.168.1.106" ,\
-                "EAST" : "192.168.1.106",\
-                "SOUTH" : "192.168.1.106",\
-                "WEST" : "192.168.1.106" }
+    IP_DICT = { "NORTH" : "192.168.1.101" ,\
+                "EAST" : "192.168.1.101",\
+                "SOUTH" : "192.168.1.101",\
+                "WEST" : "192.168.1.101" }
 
     STREAMING_PORT = 80
     STREAM_LOCATION= "/video_feed"
