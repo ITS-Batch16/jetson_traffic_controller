@@ -1,4 +1,4 @@
-from video_streamers.streaming import RPIstreamer as streamer
+from video_streamer.streaming import RPIstreamer as streamer
 from sensor.sensor import WeightedFlowSensor as Sensor
 from tracker.iou_tracker import IOU_Tracker as Tracker
 from cnn.tensorrt_uff import CNN
