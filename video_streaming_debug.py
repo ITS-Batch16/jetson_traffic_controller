@@ -4,20 +4,20 @@ from video_streamer.streaming import RPIstreamer as streamer
 
 '''Use each debug function to debug the system functionwise'''
 
-CameraSet = streamer()
+
 def stream_cameras(active_cameras):
     '''Debuggginf function for receiving Ras/pi streams'''
 
+    video_streamer = streamer(active_cameras)
     num_cameras = len(active_cameras)
-    CameraSet.open(active_cameras )
-
+    video_streamer.open()
     SHOW_TIME = 60
     t0 = time.time()
     images = [None] * num_cameras
     img_shape = None
 
     while (time.time() - t0 < SHOW_TIME):
-        frames = CameraSet.get_frames()
+        frames = video_streamer.get_frames()
 
         for i in range(num_cameras):
             frame = frames[i]
@@ -38,13 +38,12 @@ def stream_cameras(active_cameras):
             cv2.waitKey(1)
     
     cv2.destroyAllWindows()
-    CameraSet.close()
+    video_streamer.close()
 
 
 if __name__ == '__main__':
     '''Run the required debugging function below.'''
-    
-    stream_cameras(["NORTH","SOUTH"])
-    stream_cameras(["EAST","SOUTH","WEST"])
-    stream_cameras(["SOUTH"])
+    # stream_cameras(["NORTH","SOUTH"])
+    # stream_cameras(["EAST","SOUTH","WEST"])
+    # stream_cameras(["SOUTH"])
     stream_cameras(["EAST","SOUTH","WEST","NORTH"])

@@ -12,25 +12,20 @@ class RTSPstreamer:
     Reads a live frame from  a given IP camera and returns a frame whenever requested.
     """
 
-    def __init__(self):
+    def __init__(self,Camera_Names):
         """Constructor"""
         self.clients = None
-        self.frame_timeout = 1
-        all_cam_names = cfg.ipcam.CAM_NAMES
-        self.uri_dict = dict(zip(all_cam_names,cfg.ipcam.name_to_uri(all_cam_names)))
-        print("Inspecting cameras")
-        unreachable_cams = cfg.ipcam.unreachable_cams(all_cam_names)
-
-        if unreachable_cams != None:
-            err.CameraNotFoundError(unreachable_cams)
-        print("All cameras are connected")
+        self.frame_timeout = 1 #seconds
+        self.cam_names = Camera_Names
+        if cfg.ipcam.URI_DICT == None:
+            cfg.ipcam.cam_init()
+        self.uri_dict = cfg.ipcam.URI_DICT
 
     def open(self, Camera_Names):
         self.cam_names = Camera_Names
         self.clients = [rtsp.Client(self.uri_dict[name]) for name in Camera_Names]
         print('video streams opened for cameras %s'%Camera_Names.__str__()[1:-1])
         
-
     def get_frames(self):
         """Returning the current frames when requested"""
         while(True):
@@ -58,6 +53,7 @@ class RTSPstreamer:
 
     def close(self):
         for client in self.clients:client.close()
+        time.sleep(2)
         print('video streams closed for cameras %s'%self.cam_names.__str__()[1:-1])
 
 
@@ -66,29 +62,27 @@ class RPIstreamer:
     Reads a live frame from  a given Rpi-camera and returns a frame whenever requested.
     """
 
-    def __init__(self):
+    def __init__(self, Camera_Names):
         """Constructor"""
         self.frames = None
         self.http_responses = None
         self.stop_flag = None
-        all_cam_names = cfg.rpi.CAM_NAMES
-        self.uri_dict = dict(zip(all_cam_names,cfg.rpi.name_to_uri(all_cam_names)))
-        print("Inspecting cameras")
-        unreachable_cams = cfg.rpi.unreachable_cams(all_cam_names)
-
-        if unreachable_cams != None:
-            err.CameraNotFoundError(unreachable_cams)
-        print("All cameras are connected")
-
-    def open(self, Camera_Names):
-        self.stop_flag = 0
         self.cam_names = Camera_Names
-        self.frames = [None] * len(Camera_Names)
-        self.http_responses = [requests.get(self.uri_dict[name], stream=True) for name in Camera_Names]
+
+        if cfg.rpi.URI_DICT == None:
+            cfg.rpi.cam_init()
+
+        self.uri_dict = cfg.rpi.URI_DICT
+   
+    def open(self):
+        self.stop_flag = 0
+
+        self.frames = [None] * len(self.cam_names)
+        self.http_responses = [requests.get(self.uri_dict[name], stream=True) for name in self.cam_names]
 
         self.thread = threading.Thread(target=self.thread_function,daemon=True)
         self.thread.start()
-        print('video streams opened for cameras %s'%Camera_Names.__str__()[1:-1])
+        print('video streams opened for cameras %s'%self.cam_names.__str__()[1:-1])
 
     def thread_function(self):
         for lines in zip(*[rsp.iter_lines(chunk_size=512, delimiter=b'--frame', decode_unicode=False) for rsp in
