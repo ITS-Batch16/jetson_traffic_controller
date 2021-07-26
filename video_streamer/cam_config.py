@@ -1,5 +1,6 @@
 import os
 import sys
+import utils.error_mngmnt as err
 
 class ipcam:
 
@@ -13,17 +14,8 @@ class ipcam:
     STREAMING_PORT = 554
     STREAM_LOCATION= "/Streaming/Channels/102/"
     CAM_NAMES = IP_DICT.keys()
+    URI_DICT = None
 
-    @classmethod
-    def name_to_uri(cls,cam_names):
-        uri_list=[]
-        for name in cam_names:
-            uri="rtsp://%s:%s@%s:%s%s"%(cls.CAMERA_USERNAME, \
-                cls.CAMERA_PASSWORD, cls.IP_DICT[name], \
-                    cls.STREAMING_PORT, cls.STREAM_LOCATION)
-            uri_list.append(uri)
-        return uri_list
-    
     @classmethod
     def unreachable_cams(cls,cam_names):
         is_windows = sys.platform.startswith("win")
@@ -50,6 +42,27 @@ class ipcam:
         else:
             return None
 
+    @classmethod
+    def cam_init(cls):
+
+        uri_list = []
+        for name in cls.CAM_NAMES:
+            uri="rtsp://%s:%s@%s:%s%s"%(cls.CAMERA_USERNAME, \
+                cls.CAMERA_PASSWORD, cls.IP_DICT[name], \
+                    cls.STREAMING_PORT, cls.STREAM_LOCATION)
+            uri_list.append(uri)
+
+        cls.URI_DICT = dict(zip(cls.CAM_NAMES,uri_list))
+
+        print("Inspecting cameras")
+        unreachable_cams = cls.unreachable_cams(cls.CAM_NAMES)
+
+        if unreachable_cams != None:
+            err.CameraNotFoundError(unreachable_cams)
+
+        print("All cameras are connected")
+
+
 
 
 class rpi:
@@ -62,6 +75,7 @@ class rpi:
     STREAMING_PORT = 80
     STREAM_LOCATION= "/video_feed"
     CAM_NAMES = IP_DICT.keys()
+    URI_DICT = None
     
     @classmethod
     def name_to_uri(cls,cam_names):
@@ -96,4 +110,22 @@ class rpi:
             return unreachable_cam_list
         else:
             return None
+    
+    @classmethod
+    def cam_init(cls):
+
+        uri_list = []
+        for name in cls.CAM_NAMES:
+            uri="http://%s:%s%s"%( cls.IP_DICT[name], cls.STREAMING_PORT, cls.STREAM_LOCATION)
+            uri_list.append(uri)
+
+        cls.URI_DICT = dict(zip(cls.CAM_NAMES,uri_list))
+
+        print("Inspecting cameras")
+        unreachable_cams = cls.unreachable_cams(cls.CAM_NAMES)
+
+        if unreachable_cams != None:
+            err.CameraNotFoundError(unreachable_cams)
+            
+        print("All cameras are connected")
 
