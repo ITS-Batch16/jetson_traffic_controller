@@ -1,13 +1,12 @@
 from video_streamer.streaming import RPIstreamer as streamer
 from sensor.sensor import WeightedFlowSensor as Sensor
-from tracker.iou_tracker import IOU_Tracker as Tracker
 from cnn.tensorrt_uff import CNN
 from utils.utils import decode_netout, memory_available
 from config import config
 import time
 import gc
 
-camera_names = ['NORTH', 'EAST', 'SOUTH', 'WEST']
+camera_names = ['COL', 'MAH', 'KES', 'PIL']
 num_cameras = len(camera_names)
 
 #starting camera thread
@@ -15,9 +14,9 @@ video_streamer = streamer(camera_names)
 
 #Initializing sensor
 sensor = Sensor(
-    tracker=Tracker(),
     decode_netout=decode_netout,
-    config=config
+    config=config,
+    mode = "FLOW"
 )
 
 video_streamer.open()
@@ -30,7 +29,6 @@ while True:
     #Inference with continous camera streams
     # images = [cameras[name].get_frame() for name in camera_names]
     images = video_streamer.get_frames()
-    cnn.batch_predict(images)
     sensor.buffer.append(
         (images, cnn.batch_predict(images))
         )

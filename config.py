@@ -86,7 +86,7 @@ class Config():
         self.NUM_CLASSES = 4
 
         self.LANES = {
-            'n': {
+            'COL': {
                 'r': Lane(name='r',
                           phase=0,
                           adjustment=1,
@@ -108,7 +108,7 @@ class Config():
                           x_limits=(297/384, 383/384)),
 
             },
-            'e': {
+            'MAH': {
                 'r': Lane(name='r',
                           phase=3,
                           adjustment=1,
@@ -124,7 +124,7 @@ class Config():
                           adjustment=1,
                           x_limits=(291/384, 383/384))
             },
-            's': {
+            'KES': {
                 'r': Lane(name='r',
                           phase=1,
                           adjustment=1,
@@ -145,7 +145,7 @@ class Config():
                           adjustment=1,
                           x_limits=(338/384, 383/384))
             },
-            'w': {
+            'PIL': {
                 'r': Lane(name='r',
                           phase=3,
                           adjustment=1,
@@ -248,14 +248,14 @@ class Lane:
     - phase         : to which phase this lane belongs to
     - x_limits      : (xmin, xmax) range of this lane
     - measure       : flow or density or anything that we measure
-    - cycle_measure : updated every frame, reset at end of cycle
+    - flow_measure : updated every frame, reset at end of cycle
 
     NOTE
-    * After each frame, cycle_measure is updated by Tracker.update_cycle_measure(bboxes)
-    * After each cycle, all measures are updated and cycle_measures reset by Tracker.update_measures()
+    * After each frame, flow_measure is updated by Tracker.update_flow_measure(bboxes)
+    * After each cycle, all measures are updated and flow_measures reset by Tracker.update_measures()
 
     METHODS
-    - add_to_temp:  Updates cycle_measure of this lane IF bbox belongs here
+    - add_to_temp:  Updates flow_measure of this lane IF bbox belongs here
     '''
 
     def __init__(self, name, phase, adjustment=1, x_limits=None):
@@ -263,7 +263,9 @@ class Lane:
         self.phase = phase
         self.adjustment = adjustment
         self.x_limits = min(x_limits), max(x_limits)
-        self.cycle_measure = 0
+        self.flow_measure = 0
+        self.queue_measure = 0
+        self.count_measure = dict(zip(config.LABELS,[0]*config.NUM_CLASSES))
 
     def is_leaving_via(self, xmax, x_center, config):
         if self.name == 'l':
@@ -280,29 +282,31 @@ class Lane_Group:
     def __init__(self, LANES, FACTORS):
         self.LANES = LANES
         self.FACTORS = FACTORS
-        self.cycle_measure = 0
+        self.flow_measure = 0
+        self.queue_measure = 0
+        self.count_measure = 0
 
         assert len(LANES) == len(FACTORS)
 
-    def get_cycle_measure(self):
+    def get_flow_measure(self):
         '''
         Eg:
         Flow of a lane group = "u1 + u2 + 0.5 * r"
         u1, u2, r are already weighted by the lane adjustments
         '''
-        self.cycle_measure = 0
+        self.flow_measure = 0
 
         for i, lane in enumerate(self.LANES):
-            self.cycle_measure += lane.cycle_measure * self.FACTORS[i]
+            self.flow_measure += lane.flow_measure * self.FACTORS[i]
 
-        return self.cycle_measure
+        return self.flow_measure
 
 
 class Phase:
     def __init__(self, LANE_GROUPS, GREEN_STATIC):
         self.LANE_GROUPS = LANE_GROUPS
         self.GREEN_STATIC = GREEN_STATIC
-        self.cycle_measure = 0
+        self.flow_measure = 0
         self.cycle_ratio = 0
         self.smooth_measure = 0
         self.green_dynamic = GREEN_STATIC
@@ -312,7 +316,7 @@ class Phase:
         Critical flow is max flow among cycles
         '''
         # Get PCU weighted critical count
-        self.cycle_measure = max([group.get_cycle_measure()
+        self.flow_measure = max([group.get_flow_measure()
                                   for group in self.LANE_GROUPS])
         '''
         Get criical flow. Two possible ways:
@@ -338,16 +342,16 @@ class Phase:
               vehicles, its time would get reduced. 
             * (2) gives error correction, but oscillations are possible.
         '''
-        self.cycle_measure /= self.green_dynamic
+        self.flow_measure /= self.green_dynamic
 
-        return self.cycle_measure
+        return self.flow_measure
 
     def get_smooth_measure(self, config):
         config.num_cycles += 1
         '''
         Moving average across cycles
         '''
-        self.smooth_measure += (self.cycle_measure - self.smooth_measure) / \
+        self.smooth_measure += (self.flow_measure - self.smooth_measure) / \
             min(config.num_cycles, config.AVG_CYCLES)
 
 config = Config()

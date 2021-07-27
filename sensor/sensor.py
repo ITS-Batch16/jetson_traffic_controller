@@ -2,6 +2,8 @@ import cv2
 import numpy as np
 import copy
 import threading
+import time
+from tracker.iou_tracker import IOU_Tracker as Tracker
 from utils.utils import draw_boxes
 
 
@@ -19,24 +21,30 @@ Counts vehicles, weights flows, finds phase flows, takes moving average. This ru
 '''
 class WeightedFlowSensor(threading.Thread):
     def __init__(self,
-                tracker,
                 decode_netout,
                 config,
                 buffer=None,
+                mode = "FLOW"  # FLOW / QUEUE
                 ):
         super(WeightedFlowSensor, self).__init__()
         self.buffer = buffer
-        self.tracker = tracker
-        self.num_cycles = 0
-        self.stop_flag=None
+        self.tracker = None
+        self.stop_flag = None
         self.config = config
-        self.ways = ['n','e','w','s']
         self.decode_netout = decode_netout
+        self.mode = mode
     
     def open(self):
         self.stop_flag = 0
         self.buffer = []
         self.start()
+
+    def reset(self,mode):
+        time.sleep(0.5)
+        self.mode = mode
+        self.tracker = None
+        self.stop_flag = 0
+        self.buffer = []
     
     def run(self):
         while ( self.stop_flag==0):
@@ -48,43 +56,58 @@ class WeightedFlowSensor(threading.Thread):
                 '''Skipping empty buffer'''
                 continue
             
-            images, netout = self.buffer.pop(0)
+            cam_names, images, netout = self.buffer.pop(0)
             if netout is None:
                 continue
-
-            boxes = [self.decode_netout(netout[i].reshape(8,12,5,9), config=self.config) for i in range(4)]
-            images = [draw_boxes(images[i], boxes[i], labels=self.config.LABELS) for i in range(4)]
-            images = [self.after_frame(frame=images[i], boxes=boxes[i], way_n=self.ways[i]) for i in range(4)]
             
-            if self.config.SHOW_TRACKING:
-                '''Displaying the simultaneous tracking of 4 streams'''
-                images = np.vstack(
-                    (
-                    np.hstack((images[0], images[1])),
-                    np.hstack((images[2], images[3]))
-                    )
-                )
-                images = cv2.resize(images, (768, 512))
-                cv2.imshow('TRACKING', images)
-                cv2.waitKey(1)
+            batch_size = len( netout)
+
+            if self.tracker == None:
+                self.tracker = dict(zip(cam_names,[Tracker()]*batch_size))
+
+            boxes = [self.decode_netout(netout[i].reshape(8,12,5,9), config=self.config) for i in range(batch_size)]
+            images = [draw_boxes(images[i], boxes[i], labels=self.config.LABELS) for i in range(batch_size)]
+            
+            if self.mode == "FLOW":
+                images = [self.after_frame(frame=images[i], boxes=boxes[i], way_n=cam_names[i]) for i in range(batch_size)]
+                
+                if self.config.SHOW_TRACKING:
+                    '''Displaying the simultaneous tracking of 4 streams'''
+                    if batch_size ==2:
+                        images = np.hstack((images[0], images[1]))
+                        images = cv2.resize(images, (768, 256))
+
+                    elif batch_size == 4:
+                        images = np.vstack(
+                            (
+                            np.hstack((images[0], images[1])),
+                            np.hstack((images[2], images[3]))
+                            )
+                        )
+                        images = cv2.resize(images, (768, 512))
+                    cv2.imshow('TRACKING', images)
+                    cv2.waitKey(1)
+            
+            elif self.mode == "QUEUE":
+                pass
 
     def after_frame(self, frame,boxes, way_n):
         config=self.config
 
-        self.tracker.associate(bboxes=boxes,
+        self.tracker[way_n].associate(bboxes=boxes,
                                way_n=way_n,
                                config=config)
         if config.SHOW_TRACKING:
-            frame = self.tracker.draw_tracking(frame, way_n, boxes,
+            frame = self.tracker[way_n].draw_tracking(frame, way_n, boxes,
                                                LABELS=config.LABELS,
                                                config=config)
-        self.update_lane_measures(way_n=way_n, config=config)
+        self.update_flow_measures(way_n=way_n, config=config)
 
         return frame
 
 
-    def update_lane_measures(self, way_n, config):
-        for track in self.tracker.tracks_leaving:
+    def update_flow_measures(self, way_n, config):
+        for track in self.tracker[way_n].tracks_leaving:
 
             '''
             Hold ghost tracks to prevent double counting
@@ -103,7 +126,10 @@ class WeightedFlowSensor(threading.Thread):
             for lane in config.LANES[way_n].values():
 
                 if lane.is_leaving_via(xmax=track.bbox_last.xmax, x_center=x_center, config=config):
-                    lane.cycle_measure += config.PCU[track.label_i]
+                    lane.flow_measure += config.PCU[track.label_i]
+                    lane.count_measure[track.label_i] + = 1
+
+    #def update_queue_measure:
 
     def close(self):
         self.stop_flag = 1

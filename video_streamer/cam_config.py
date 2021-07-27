@@ -72,18 +72,14 @@ class rpi:
                 "KES" : "192.168.1.101",\
                 "PIL" : "192.168.1.101" }
 
-    STREAMING_PORT = 80
+    STREAMING_PORT = { "COL" : "1111" ,\
+                "MAH" : "2222",\
+                "KES" : "1111",\
+                "PIL" : "2222" }
+
     STREAM_LOCATION= "/video_feed"
     CAM_NAMES = IP_DICT.keys()
     URI_DICT = None
-    
-    @classmethod
-    def name_to_uri(cls,cam_names):
-        uri_list=[]
-        for name in cam_names:
-            uri="http://%s:%s%s"%( cls.IP_DICT[name], cls.STREAMING_PORT, cls.STREAM_LOCATION)
-            uri_list.append(uri)
-        return uri_list
 
     @classmethod
     def unreachable_cams(cls,cam_names):
@@ -116,7 +112,7 @@ class rpi:
 
         uri_list = []
         for name in cls.CAM_NAMES:
-            uri="http://%s:%s%s"%( cls.IP_DICT[name], cls.STREAMING_PORT, cls.STREAM_LOCATION)
+            uri="http://%s:%s%s"%( cls.IP_DICT[name], cls.STREAMING_PORT[name], cls.STREAM_LOCATION)
             uri_list.append(uri)
 
         cls.URI_DICT = dict(zip(cls.CAM_NAMES,uri_list))
