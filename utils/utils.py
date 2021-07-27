@@ -67,13 +67,13 @@ def draw_boxes(image, boxes, labels):
         xmax = int(box.xmax*image_w)
         ymax = int(box.ymax*image_h)
 
-        cv2.rectangle(image, (xmin,ymin), (xmax,ymax), (0,255,0), 3)
+        cv2.rectangle(image, (xmin,ymin), (xmax,ymax), (0,255,0), 2)
         cv2.putText(image, 
                     labels[box.get_label()] + ' ' + str(box.get_score()), 
                     (xmin, ymin - 13), 
                     cv2.FONT_HERSHEY_SIMPLEX, 
                     1e-3 * image_h, 
-                    (0,255,0), 2)
+                    (0,255,0), 1)
         
     return image          
         

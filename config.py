@@ -166,40 +166,40 @@ class Config():
         self.PHASES = [
             Phase(
                 LANE_GROUPS=[
-                    Lane_Group(LANES=[self.LANES['s']['u1']],
+                    Lane_Group(LANES=[self.LANES['COL']['u1']],
                                FACTORS=[1]),
-                    Lane_Group(LANES=[self.LANES['s']['u2']],
+                    Lane_Group(LANES=[self.LANES['COL']['u2']],
                                FACTORS=[1]),
-                    Lane_Group(LANES=[self.LANES['s']['r']],
+                    Lane_Group(LANES=[self.LANES['COL']['r']],
                                FACTORS=[1])
                 ],
                 GREEN_STATIC=17),
 
             Phase(
                 LANE_GROUPS=[
-                    Lane_Group(LANES=[self.LANES['n']['u1']],
+                    Lane_Group(LANES=[self.LANES['KES']['u1']],
                                FACTORS=[1]),
-                    Lane_Group(LANES=[self.LANES['n']['u2']],
+                    Lane_Group(LANES=[self.LANES['KES']['u2']],
                                FACTORS=[1]),
-                    Lane_Group(LANES=[self.LANES['n']['r']],
+                    Lane_Group(LANES=[self.LANES['KES']['r']],
                                FACTORS=[1])
                 ],
                 GREEN_STATIC=12),
 
             Phase(
                 LANE_GROUPS=[
-                    Lane_Group(LANES=[self.LANES['w']['u']],
+                    Lane_Group(LANES=[self.LANES['PIL']['u']],
                                FACTORS=[1]),
-                    Lane_Group(LANES=[self.LANES['e']['u']],
+                    Lane_Group(LANES=[self.LANES['MAH']['u']],
                                FACTORS=[1]),
                 ],
                 GREEN_STATIC=17),
 
             Phase(
                 LANE_GROUPS=[
-                    Lane_Group(LANES=[self.LANES['w']['r']],
+                    Lane_Group(LANES=[self.LANES['PIL']['r']],
                                FACTORS=[1]),
-                    Lane_Group(LANES=[self.LANES['e']['r']],
+                    Lane_Group(LANES=[self.LANES['MAH']['r']],
                                FACTORS=[1]),
                 ],
                 GREEN_STATIC=7),
@@ -265,7 +265,7 @@ class Lane:
         self.x_limits = min(x_limits), max(x_limits)
         self.flow_measure = 0
         self.queue_measure = 0
-        self.count_measure = dict(zip(config.LABELS,[0]*config.NUM_CLASSES))
+        self.count_measure = dict(zip(['motorbike', 'three-wheeler', 'car', 'truck'],[0,0,0,0]))
 
     def is_leaving_via(self, xmax, x_center, config):
         if self.name == 'l':

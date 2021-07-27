@@ -54,11 +54,11 @@ class ipcam:
 
         cls.URI_DICT = dict(zip(cls.CAM_NAMES,uri_list))
 
-        print("Inspecting cameras")
-        unreachable_cams = cls.unreachable_cams(cls.CAM_NAMES)
+        # print("Inspecting cameras")
+        # unreachable_cams = cls.unreachable_cams(cls.CAM_NAMES)
 
-        if unreachable_cams != None:
-            err.CameraNotFoundError(unreachable_cams)
+        # if unreachable_cams != None:
+        #     err.CameraNotFoundError(unreachable_cams)
 
         print("All cameras are connected")
 
@@ -117,11 +117,11 @@ class rpi:
 
         cls.URI_DICT = dict(zip(cls.CAM_NAMES,uri_list))
 
-        print("Inspecting cameras")
-        unreachable_cams = cls.unreachable_cams(cls.CAM_NAMES)
+        # print("Inspecting cameras")
+        # unreachable_cams = cls.unreachable_cams(cls.CAM_NAMES)
 
-        if unreachable_cams != None:
-            err.CameraNotFoundError(unreachable_cams)
+        # if unreachable_cams != None:
+        #     err.CameraNotFoundError(unreachable_cams)
             
         print("All cameras are connected")
 
