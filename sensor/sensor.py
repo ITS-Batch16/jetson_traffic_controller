@@ -33,6 +33,7 @@ class WeightedFlowSensor(threading.Thread):
         self.config = config
         self.decode_netout = decode_netout
         self.mode = mode
+        self.daemon = True
     
     def open(self):
         self.stop_flag = 0
@@ -63,7 +64,7 @@ class WeightedFlowSensor(threading.Thread):
             batch_size = len( netout)
 
             if self.tracker == None:
-                self.tracker = dict(zip(cam_names,[Tracker()]*batch_size))
+                self.tracker = dict(zip(cam_names,[Tracker() for i in range(batch_size)]))
 
             boxes = [self.decode_netout(netout[i].reshape(8,12,5,9), config=self.config) for i in range(batch_size)]
             images = [draw_boxes(images[i], boxes[i], labels=self.config.LABELS) for i in range(batch_size)]
@@ -73,9 +74,12 @@ class WeightedFlowSensor(threading.Thread):
                 
                 if self.config.SHOW_TRACKING:
                     '''Displaying the simultaneous tracking of 4 streams'''
-                    if batch_size ==2:
+
+                    if batch_size ==1:
+                        images = images[0]
+                    elif batch_size ==2:
                         images = np.hstack((images[0], images[1]))
-                        images = cv2.resize(images, (768, 256))
+                        # images = cv2.resize(images, (768, 256))
 
                     elif batch_size == 4:
                         images = np.vstack(
@@ -101,7 +105,9 @@ class WeightedFlowSensor(threading.Thread):
             frame = self.tracker[way_n].draw_tracking(frame, way_n, boxes,
                                                LABELS=config.LABELS,
                                                config=config)
+        print(len(self.tracker[way_n].tracks_leaving))
         self.update_flow_measures(way_n=way_n, config=config)
+        
 
         return frame
 
@@ -116,7 +122,7 @@ class WeightedFlowSensor(threading.Thread):
 
             if track.left_count > config.GHOST_BOX_DURATIONS[track.label_i]:
                 print("Label:    ", config.LABELS[track.label_i])
-                self.tracker.tracks_leaving.remove(track)
+                self.tracker[way_n].tracks_leaving.remove(track)
                 continue
             elif track.left_count > 0:
                 continue
@@ -126,11 +132,11 @@ class WeightedFlowSensor(threading.Thread):
             for lane in config.LANES[way_n].values():
 
                 if lane.is_leaving_via(xmax=track.bbox_last.xmax, x_center=x_center, config=config):
+                    print(x_center)
                     lane.flow_measure += config.PCU[track.label_i]
-                    lane.count_measure[track.label_i] + = 1
+                    lane.count_measure[track.label_i] += 1
 
     #def update_queue_measure:
 
     def close(self):
         self.stop_flag = 1
-

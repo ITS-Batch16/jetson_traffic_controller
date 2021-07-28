@@ -6,7 +6,7 @@ from config import config
 import time
 import gc
 
-camera_names = ['COL', 'MAH', 'KES', 'PIL']
+camera_names = ['COL', 'MAH']#, 'KES', 'PIL']
 num_cameras = len(camera_names)
 
 #starting camera thread
@@ -30,7 +30,7 @@ while True:
     # images = [cameras[name].get_frame() for name in camera_names]
     images = video_streamer.get_frames()
     sensor.buffer.append(
-        (images, cnn.batch_predict(images))
+        (camera_names, images, cnn.batch_predict(images))
         )
     if time.time()-t_start>5:
         print(memory_available())
