@@ -87,122 +87,113 @@ class Config():
 
         self.LANES = {
             'COL': {
-                'r': Lane(name='r',
+                'R': Lane(name='R',
+                          way_n = 'COL',
                           phase=0,
                           adjustment=1,
                           x_limits=(11/384, 121/384)),
 
-                'u1': Lane(name='c',
+                'S': Lane(name='S',
+                           way_n = 'COL',
                            phase=0,
                            adjustment=1,
-                           x_limits=(121/384, 209/384)),
+                           x_limits=(121/384, 297/384)),
 
-                'u2': Lane(name='c',
-                           phase=0,
-                           adjustment=1,
-                           x_limits=(209/384, 297/384)),
-
-                'l': Lane(name='l',
+                'L': Lane(name='L',
+                          way_n = 'COL',
                           phase=-1,
                           adjustment=1,
                           x_limits=(297/384, 383/384)),
 
             },
             'MAH': {
-                'r': Lane(name='r',
+                'R': Lane(name='R',
+                          way_n = 'MAH',
                           phase=3,
                           adjustment=1,
                           x_limits=(69/384, 167/384)),
 
-                'u': Lane(name='u',
+                'S': Lane(name='S',
+                          way_n = 'MAH',
                           phase=2,
                           adjustment=1,
                           x_limits=(167/384, 291/384)),
 
-                'l': Lane(name='l',
+                'L': Lane(name='L',
+                          way_n = 'MAH',
                           phase=-1,
                           adjustment=1,
                           x_limits=(291/384, 383/384))
             },
             'KES': {
-                'r': Lane(name='r',
+                'R': Lane(name='R',
+                          way_n = 'KES',
                           phase=1,
                           adjustment=1,
                           x_limits=(58/384, 150/384)),
 
-                'u1': Lane(name='u1',
+                'S': Lane(name='S',
+                           way_n = 'KES',
                            phase=1,
                            adjustment=1,
-                           x_limits=(150/384, 244/384)),
+                           x_limits=(150/384, 338/384)),
 
-                'u2': Lane(name='u2',
-                           phase=1,
-                           adjustment=1,
-                           x_limits=(244/384, 338/384)),
-
-                'l': Lane(name='l',
+                'L': Lane(name='L',
+                          way_n = 'KES',
                           phase=-1,
                           adjustment=1,
                           x_limits=(338/384, 383/384))
             },
             'PIL': {
-                'r': Lane(name='r',
+                'R': Lane(name='R',
+                          way_n = 'PIL',
                           phase=3,
                           adjustment=1,
                           x_limits=(83/384, 176/384)),
 
-                'u': Lane(name='u',
+                'S': Lane(name='S',
+                          way_n = 'PIL',
                           phase=2,
                           adjustment=1,
                           x_limits=(176/384, 268/384)),
 
-                'l': Lane(name='l',
+                'L': Lane(name='L',
+                          way_n = 'PIL',
                           phase=-1,
                           adjustment=1,
                           x_limits=(268/384, 383/384))
             }
         }
 
+        self.CYCLE_TIME = 80
         self.PHASES = [
             Phase(
-                LANE_GROUPS=[
-                    Lane_Group(LANES=[self.LANES['COL']['u1']],
-                               FACTORS=[1]),
-                    Lane_Group(LANES=[self.LANES['COL']['u2']],
-                               FACTORS=[1]),
-                    Lane_Group(LANES=[self.LANES['COL']['r']],
-                               FACTORS=[1])
+                LANES=[
+                    self.LANES['PIL']['S'],
+                    self.LANES['MAH']['S']
                 ],
-                GREEN_STATIC=17),
+                GREEN_STATIC=(2,18)),
 
             Phase(
-                LANE_GROUPS=[
-                    Lane_Group(LANES=[self.LANES['KES']['u1']],
-                               FACTORS=[1]),
-                    Lane_Group(LANES=[self.LANES['KES']['u2']],
-                               FACTORS=[1]),
-                    Lane_Group(LANES=[self.LANES['KES']['r']],
-                               FACTORS=[1])
+                LANES=[
+                    self.LANES['PIL']['R'],
+                    self.LANES['MAH']['R']
                 ],
-                GREEN_STATIC=12),
+                GREEN_STATIC=(22,38)),
 
             Phase(
-                LANE_GROUPS=[
-                    Lane_Group(LANES=[self.LANES['PIL']['u']],
-                               FACTORS=[1]),
-                    Lane_Group(LANES=[self.LANES['MAH']['u']],
-                               FACTORS=[1]),
+                LANES=[
+                    self.LANES['COL']['S'],
+                    self.LANES['COL']['R']
                 ],
-                GREEN_STATIC=17),
+                GREEN_STATIC=(42,58)),
 
             Phase(
-                LANE_GROUPS=[
-                    Lane_Group(LANES=[self.LANES['PIL']['r']],
-                               FACTORS=[1]),
-                    Lane_Group(LANES=[self.LANES['MAH']['r']],
-                               FACTORS=[1]),
+                LANES=[
+                    self.LANES['KES']['S'],
+                    self.LANES['KES']['R']
                 ],
-                GREEN_STATIC=7),
+                GREEN_STATIC=(62,78))
         ]
         
         self.MAX_NETOUT_BUFFER_SIZE=700
@@ -258,8 +249,9 @@ class Lane:
     - add_to_temp:  Updates flow_measure of this lane IF bbox belongs here
     '''
 
-    def __init__(self, name, phase, adjustment=1, x_limits=None):
+    def __init__(self, name, way_n, phase, adjustment=1, x_limits=None):
         self.name = name
+        self.way_n = way_n
         self.phase = phase
         self.adjustment = adjustment
         self.x_limits = min(x_limits), max(x_limits)
@@ -276,35 +268,21 @@ class Lane:
             if self.x_limits[0] <= x_center <= self.x_limits[1]:
                 return True
                 # print('lane', lane.name)
-
-
-class Lane_Group:
-    def __init__(self, LANES, FACTORS):
-        self.LANES = LANES
-        self.FACTORS = FACTORS
-        self.flow_measure = 0
-        self.queue_measure = 0
-        self.count_measure = 0
-
-        assert len(LANES) == len(FACTORS)
-
+    
     def get_flow_measure(self):
-        '''
-        Eg:
-        Flow of a lane group = "u1 + u2 + 0.5 * r"
-        u1, u2, r are already weighted by the lane adjustments
-        '''
-        self.flow_measure = 0
-
-        for i, lane in enumerate(self.LANES):
-            self.flow_measure += lane.flow_measure * self.FACTORS[i]
-
         return self.flow_measure
 
+    def lane_reset(self):
+        self.flow_measure = 0
+        self.queue_measure = 0
+        self.count_measure = dict(zip(['motorbike', 'three-wheeler', 'car', 'truck'],[0,0,0,0]))
+
+
+    
 
 class Phase:
-    def __init__(self, LANE_GROUPS, GREEN_STATIC):
-        self.LANE_GROUPS = LANE_GROUPS
+    def __init__(self, LANES, GREEN_STATIC):
+        self.LANES = LANES
         self.GREEN_STATIC = GREEN_STATIC
         self.flow_measure = 0
         self.cycle_ratio = 0

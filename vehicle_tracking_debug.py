@@ -40,6 +40,11 @@ while True:
 
     if time.time()-t_start >  tracking_time:
         break
+    
+    # print("flow1: ", config.LANES["COL"]["r"].flow_measure)
+    # print("flow2: ", config.LANES["COL"]["u1"].flow_measure)
+    # print("flow3: ", config.LANES["COL"]["u2"].flow_measure)
+    # print("flow4: ", config.LANES["COL"]["l"].flow_measure)
 
 sensor.close()
 video_streamer.close()

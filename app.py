@@ -32,87 +32,67 @@ sensor.open()
 cnn = CNN(batch_size= 2)
 t_start=time.time()
 
-
-Phase_conf = { "P1":{
-                    "cams":["MAH","PIL"],
-                    "lanes":["STRAIGHT","STRAIGHT"],
-                    "phase_time":[2,10]
-                    },
-
-                "P2":{
-                    "cams":["MAH","PIL"],
-                    "lanes":["RIGHT","RIGHT"],
-                    "phase_time":[13,10]
-                    },
-
-                "P3":{
-                    "cams":["MAH","PIL"],
-                    "lanes":["RIGHT","RIGHT"],
-                    "phase_time":[13,10]
-                    },
-                "P4":{
-                    "cams":["MAH","PIL"],
-                    "lanes":["RIGHT","RIGHT"],
-                    "phase_time":[13,10]
-                    },
-                    
-
-
-
-CYCLE_TIME = 60
-REF_TIME =  
-QUEUE_CALC_INTERVAL = 2
-QUEUE_FRAMES = 10
+CYCLE_TIME = config.CYCLE_TIME
+REF_TIME =  time.time()-300
+# QUEUE_CALC_INTERVAL = 2
+# QUEUE_FRAMES = 10
 
 
 while True:
-    # if plc.cycle_start == True :
-    #     for Phase in Phases_conf:
-    #         while(plc.status == "OFF-GREEN"):time.sleep(0.1)
-    #         while(plc.status == "ON-GREEN"):
+    Traffic_flow = \
+        {
+            'COL': {
+                'R': None,
+                'S': None
+            },
+            'MAH': {
+                'R':None,
+                'S': None
 
+            },
+            'KES': {
+                'R':None,
+                'S': None
+            },
+            'PIL': {
+                'R':None,
+                'S': None
+            },
+        }
+    t_now= time.time()
+    t0 = t_now +CYCLE_TIME - (int(t_now -REF_TIME)%CYCLE_TIME)
     
-    que_lengths ={} , pcu_counts ={}  , vehicle_counts = {}
+    for Phase in config.PHASES:
 
-    for phase in Phase_conf:
-        cam_names = phase["cams"]
-        lanes = phase["lanes"]
-        phase_start = t0 + 
-        phase_end = 
- 
+        lanes = Phase.self.LANES
+        cam_names = [lane.way_n for lane in lanes]
+        
+        phase_start = t0 + Phase.GREEN_STATIC[0]
+        phase_end = phase_start + Phase.GREEN_STATIC[1]
+
         while(time.time() < phase_start)
-        sensor.change_mode("FLOW")
+        sensor.reset("FLOW")
         while(phase_start < time.time() < phase_end):
             images = video_streamer.get_frames(ret_dict = True)
             images = [images[cam_names[0]],images[cam_names[1]]]
             sensor.buffer.append(cam_names, images, cnn.batch_predict(images))
+        for lane in lanes:
+            Traffic_flow[lane.way_n][lane.name] = lane.flow_measure
         
         sensor.change_mode("QUEUE")
-        frame_count = 0
-        while( frame_count < QUEUE_FRAMES):
-            images = video_streamer.get_frames(ret_dict = True)
-            images = [images[cam_names[0]],images[cam_names[1]]]
-            sensor.buffer.append(cam_names, images, cnn.batch_predict(images))
-            frame_count+=1
+        # frame_count = 0
+        # while( frame_count < QUEUE_FRAMES):
+        #     images = video_streamer.get_frames(ret_dict = True)
+        #     images = [images[cam_names[0]],images[cam_names[1]]]
+        #     sensor.buffer.append(cam_names, images, cnn.batch_predict(images))
+        #     frame_count+=1
+        
+        # for lane in lanes:
+        #     Traffic_queue[lane.way_n][lane.name] = lane.queue_measure
 
-        que_lengths , pcu_counts , vehicle_counts  = sensor.out_params()
+    print(Traffic_flow)
     
-    calc_times()
-    send_to_dashborad()
-    reset_lane_measures()
-
-
-
-
-    
-
-
-
-
-
-
-
-
-    else:
-        continue
+    # calc_times()
+    # send_to_dashborad()
+    # reset_lane_measures()
 
