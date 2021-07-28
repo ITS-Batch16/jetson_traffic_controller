@@ -6,12 +6,14 @@ from utils.utils import decode_netout, memory_available
 from config import config
 import time
 import gc
+import sys
+from datetime import datetime
 
-old_f = sys.stdout
-class F:
-    def write(self, x):
-        old_f.write(x.replace("\n", " [%s]\n" % str(datetime.now())))
-sys.stdout = F()
+# old_f = sys.stdout
+# class F:
+#     def write(self, x):
+#         old_f.write(x.replace("\n", " [%s]\n" % str(datetime.now())))
+# sys.stdout = F()
 
 
 camera_names = ['COL', 'MAH', 'KES', 'PIL']
@@ -33,7 +35,7 @@ cnn = CNN(batch_size= 2)
 t_start=time.time()
 
 CYCLE_TIME = config.CYCLE_TIME
-REF_TIME =  time.time()-300
+REF_TIME =  time.time()-75
 # QUEUE_CALC_INTERVAL = 2
 # QUEUE_FRAMES = 10
 
@@ -61,25 +63,27 @@ while True:
         }
     t_now= time.time()
     t0 = t_now +CYCLE_TIME - (int(t_now -REF_TIME)%CYCLE_TIME)
-    
+    count = 0
     for Phase in config.PHASES:
-
-        lanes = Phase.self.LANES
+        count+=1
+        lanes = Phase.LANES
         cam_names = [lane.way_n for lane in lanes]
         
         phase_start = t0 + Phase.GREEN_STATIC[0]
-        phase_end = phase_start + Phase.GREEN_STATIC[1]
-
-        while(time.time() < phase_start)
+        phase_end = t0 + Phase.GREEN_STATIC[1]
         sensor.reset("FLOW")
+        while(time.time() < phase_start):time.sleep(0.1)
+        print(str(datetime.now())[:-7],"Green time started for phase %s and %s"%(cam_names[0],cam_names[1]))
         while(phase_start < time.time() < phase_end):
             images = video_streamer.get_frames(ret_dict = True)
             images = [images[cam_names[0]],images[cam_names[1]]]
-            sensor.buffer.append(cam_names, images, cnn.batch_predict(images))
+            sensor.buffer.append((cam_names, images, cnn.batch_predict(images)))
+        print(str(datetime.now())[:-7],"Green time ended for phase %d"%count)
         for lane in lanes:
-            Traffic_flow[lane.way_n][lane.name] = lane.flow_measure
+            Traffic_flow[lane.way_n][lane.name] = lane.count_measure
         
-        sensor.change_mode("QUEUE")
+        sensor.reset("QUEUE")
+        print("Switching Phase")
         # frame_count = 0
         # while( frame_count < QUEUE_FRAMES):
         #     images = video_streamer.get_frames(ret_dict = True)

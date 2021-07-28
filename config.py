@@ -205,10 +205,10 @@ class Config():
 
     def set_param(self):
         self.NUM_PHASES = len(self.PHASES)
-        self.GREEN_TOTAL = sum([phase.GREEN_STATIC for phase in self.PHASES])
+        #self.GREEN_TOTAL = sum([phase.GREEN_STATIC for phase in self.PHASES])
 
-        assert self.GREEN_MIN < (
-            self.GREEN_TOTAL / self.NUM_PHASES) < self.GREEN_MAX
+        # assert self.GREEN_MIN < (
+        #     self.GREEN_TOTAL / self.NUM_PHASES) < self.GREEN_MAX
 
         self.Y_MIN = int(self.H_SHOW * self.Y_MIN_RATIO)
         self.Y_MAX_START = int(self.H_SHOW * self.Y_MAX_START_RATIO)

@@ -41,7 +41,7 @@ class WeightedFlowSensor(threading.Thread):
         self.start()
 
     def reset(self,mode):
-        time.sleep(0.5)
+        time.sleep(0.2)
         self.mode = mode
         self.tracker = None
         self.stop_flag = 0
