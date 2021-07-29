@@ -8,6 +8,7 @@ import time
 import gc
 import sys
 from datetime import datetime
+import copy
 
 # old_f = sys.stdout
 # class F:
@@ -36,31 +37,15 @@ t_start=time.time()
 
 CYCLE_TIME = config.CYCLE_TIME
 REF_TIME =  time.time()-75
-# QUEUE_CALC_INTERVAL = 2
-# QUEUE_FRAMES = 10
+QUEUE_CALC_INTERVAL = 2
+QUEUE_FRAMES = 10
 
 
 while True:
-    Traffic_flow = \
-        {
-            'COL': {
-                'R': None,
-                'S': None
-            },
-            'MAH': {
-                'R':None,
-                'S': None
+    flow = copy.deepcopy(config.TRAFFIC_MEASURE_TEMPLATE)
+    queue = copy.deepcopy(config.TRAFFIC_MEASURE_TEMPLATE)
+    vehicle_count = copy.deepcopy(config.TRAFFIC_MEASURE_TEMPLATE)
 
-            },
-            'KES': {
-                'R':None,
-                'S': None
-            },
-            'PIL': {
-                'R':None,
-                'S': None
-            },
-        }
     t_now= time.time()
     t0 = t_now +CYCLE_TIME - (int(t_now -REF_TIME)%CYCLE_TIME)
     count = 0
@@ -71,30 +56,39 @@ while True:
         
         phase_start = t0 + Phase.GREEN_STATIC[0]
         phase_end = t0 + Phase.GREEN_STATIC[1]
+        
         sensor.reset("FLOW")
+
         while(time.time() < phase_start):time.sleep(0.1)
         print(str(datetime.now())[:-7],"Green time started for phase %s and %s"%(cam_names[0],cam_names[1]))
+        
         while(phase_start < time.time() < phase_end):
             images = video_streamer.get_frames(ret_dict = True)
             images = [images[cam_names[0]],images[cam_names[1]]]
             sensor.buffer.append((cam_names, images, cnn.batch_predict(images)))
         print(str(datetime.now())[:-7],"Green time ended for phase %d"%count)
+        
         for lane in lanes:
-            Traffic_flow[lane.way_n][lane.name] = lane.count_measure
+            flow[lane.way_n][lane.name] = lane.get_flow_measure()
+            vehicle_count[lane.way_n][lane.name] = lane.get_count_measure()
         
         sensor.reset("QUEUE")
-        print("Switching Phase")
-        # frame_count = 0
-        # while( frame_count < QUEUE_FRAMES):
-        #     images = video_streamer.get_frames(ret_dict = True)
-        #     images = [images[cam_names[0]],images[cam_names[1]]]
-        #     sensor.buffer.append(cam_names, images, cnn.batch_predict(images))
-        #     frame_count+=1
+   
+        frame_count = 0
+        while( frame_count < QUEUE_FRAMES):
+            images = video_streamer.get_frames(ret_dict = True)
+            images = [images[cam_names[0]],images[cam_names[1]]]
+            sensor.buffer.append(cam_names, images, cnn.batch_predict(images))
+            frame_count+=1
         
-        # for lane in lanes:
-        #     Traffic_queue[lane.way_n][lane.name] = lane.queue_measure
+        for lane in lanes:
+            queue[lane.way_n][lane.name] = lane.get_queue_measure()
+             
+        print("Switching Phase")
 
-    print(Traffic_flow)
+    print(flow)
+    print(queue)
+    print(flow)
     
     # calc_times()
     # send_to_dashborad()

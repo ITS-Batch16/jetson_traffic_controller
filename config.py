@@ -85,84 +85,120 @@ class Config():
         self.ANCHORS = [0.57273, 0.677385, 1.87446, 2.06253,
                         3.33843, 5.47434, 7.88282, 3.52778, 9.77052, 9.16828]
         self.NUM_CLASSES = 4
+        self.TRAFFIC_MEASURE_TEMPLATE =Traffic_flow = \
+        {
+            'COL': {
+                'R': None,
+                'S': None,
+                'L':None
+            },
+            'MAH': {
+                'R':None,
+                'S': None,
+                'L':None
+
+            },
+            'KES': {
+                'R':None,
+                'S': None,
+                'L':None
+            },
+            'PIL': {
+                'R':None,
+                'S': None,
+                'L':None
+                
+            },
+        }
 
         self.LANES = {
             'COL': {
                 'R': Lane(name='R',
                           way_n = 'COL',
-                          phase=0,
-                          adjustment=1,
-                          x_limits=(11/384, 121/384)),
+                          phase=3,
+                          x_limits=(0.1039,0.2945),
+                          left_boubdary=((0.1039,0.968),(0.4055,0.2777)),
+                          right_boubdary=((0.2945,0.968),(0.4570,0.2777))),
 
                 'S': Lane(name='S',
                            way_n = 'COL',
-                           phase=0,
-                           adjustment=1,
-                           x_limits=(121/384, 297/384)),
+                           phase=3,
+                           x_limits=(0.2945, 0.5437),
+                           left_boubdary=((0.2945,0.968),(0.4570,0.2777)),
+                           right_boubdary=((0.5437,0.968),(0.5656,0.2777))),
 
                 'L': Lane(name='L',
                           way_n = 'COL',
                           phase=-1,
-                          adjustment=1,
-                          x_limits=(297/384, 383/384)),
+                          x_limits=(0.5437,0.9687),
+                          left_boubdary=((0.5437,0.968),(0.5656,0.2777)),
+                          right_boubdary=((1,0.7903),(0.6031,0.2777))),
 
             },
             'MAH': {
                 'R': Lane(name='R',
                           way_n = 'MAH',
-                          phase=3,
-                          adjustment=1,
-                          x_limits=(69/384, 167/384)),
+                          phase=2,
+                          x_limits=(0.3023, 0.5656),
+                          left_boubdary=((0.3023,0.968),(0.4570,0.2777)),
+                          right_boubdary=((0.5656,0.968),(0.5195,0.2777))),
 
                 'S': Lane(name='S',
                           way_n = 'MAH',
-                          phase=2,
-                          adjustment=1,
-                          x_limits=(167/384, 291/384)),
+                          phase=1,
+                          x_limits=(0.5656,0.8),
+                          left_boubdary=((0.5656,0.968),(0.5195,0.2777)),
+                          right_boubdary=((0.8,0.968),(0.5953,0.2777))),
 
                 'L': Lane(name='L',
                           way_n = 'MAH',
                           phase=-1,
-                          adjustment=1,
-                          x_limits=(291/384, 383/384))
+                          x_limits=(0.8,0.9687),
+                          left_boubdary=((0.8,0.968),(0.5953,0.2777)),
+                          right_boubdary=((1,0.7361),(0.6289,0.2777))),
             },
             'KES': {
                 'R': Lane(name='R',
                           way_n = 'KES',
-                          phase=1,
-                          adjustment=1,
-                          x_limits=(58/384, 150/384)),
+                          phase=4,
+                          x_limits=(0.1070, 0.3125),
+                          left_boubdary=((0.1070,0.968),(0.4437,0.2777)),
+                          right_boubdary=((0.3125,0.968),(0.4867,0.2777))),
 
                 'S': Lane(name='S',
                            way_n = 'KES',
-                           phase=1,
-                           adjustment=1,
-                           x_limits=(150/384, 338/384)),
+                           phase=4,
+                           x_limits=(0.3125, 0.7679),
+                           left_boubdary=((0.3125,0.968),(0.4867,0.2777)),
+                           right_boubdary=((0.7679,0.968),(0.5734,0.2777))),
 
                 'L': Lane(name='L',
                           way_n = 'KES',
-                          phase=-1,
-                          adjustment=1,
-                          x_limits=(338/384, 383/384))
+                          phase=0,
+                          x_limits=(0.7679, 0.9687),
+                          left_boubdary=((0.7679,0.968),(0.5734,0.2777)),
+                          right_boubdary=((1,0.9028),(0.5859,0.2777))),
             },
             'PIL': {
                 'R': Lane(name='R',
                           way_n = 'PIL',
-                          phase=3,
-                          adjustment=1,
-                          x_limits=(83/384, 176/384)),
-
+                          phase=2,
+                          x_limits=(0.2547, 0.4687),
+                          left_boubdary=((0.2547,0.968),(0.4414,0.2777)),
+                          right_boubdary=((0.4687,0.968),(0.4664,0.2777))),
                 'S': Lane(name='S',
                           way_n = 'PIL',
-                          phase=2,
-                          adjustment=1,
-                          x_limits=(176/384, 268/384)),
+                          phase=1,
+                          x_limits=(0.4687, 0.7602),
+                          left_boubdary=((0.4687,0.968),(0.4664,0.2777)),
+                          right_boubdary=((0.7602,0.968),(0.5352,0.2777))),
 
                 'L': Lane(name='L',
                           way_n = 'PIL',
-                          phase=-1,
-                          adjustment=1,
-                          x_limits=(268/384, 383/384))
+                          phase=0,
+                          x_limits=(0.7602, 0.9687),
+                          right_boubdary=((0.7602,0.968),(0.5352,0.2777))),
+                          right_boubdary=((1,0.875),(0.5727,0.2777))),
             }
         }
 
@@ -252,44 +288,55 @@ class Lane:
     - add_to_temp:  Updates flow_measure of this lane IF bbox belongs here
     '''
 
-    def __init__(self, name, way_n, phase, adjustment=1, x_limits=None):
+    def __init__(self, name, way_n, phase, x_limits=None, left_boubdary = None,right_boubdary = None):
         self.name = name
         self.way_n = way_n
         self.phase = phase
-        self.adjustment = adjustment
         self.x_limits = min(x_limits), max(x_limits)
-        self.lane_boundries = None
+        self.left_boubdary = left_boubdary
+        self.right_boubdary = right_boubdary
         self.flow_measure = 0
         self.queue_measure = 0
+        self.queue_frame_count = 0
         self.count_measure = dict(zip(['motorbike', 'three-wheeler', 'car', 'truck'],[0,0,0,0]))
 
     def is_leaving_via(self, xmax, x_center, config):
-        if self.name == 'l':
+        if self.name == 'L':
             if xmax > config.X_MAX_END_RATIO:
-                # print('lane', 'l')
+                # print('lane', 'lL')
                 return True
         else:
             if self.x_limits[0] <= x_center <= self.x_limits[1]:
                 return True
                 # print('lane', lane.name)
 
-    # def is_on_lane(self,point):
-    #     l1 = Line(self.lane_boundries[0])
-    #     l2 = Line(self.lane_boundries[1])
-    #     p = Point(point)
-    #     pl1 = l1.perpendicular_line(p)
-    #     pl2 = l2.perpendicular_line(p)
+    def is_on_lane(self,point):
+        l1 = Line(self.left_boubdary)
+        l2 = Line(self.right_boubdary)
+        p = Point(point)
+        pl1 = l1.perpendicular_line(p)
+        pl2 = l2.perpendicular_line(p)
 
-    #     angle = float(pl1.smallest_angle_between(pl2))
+        angle = float(pl1.smallest_angle_between(pl2))
 
-    #     if angle < math.pi*0.5:
-    #         return True
-    #     else:
-    #         return False
+        if angle < math.pi*0.5:
+            return True
+        else:
+            return False
 
     
     def get_flow_measure(self):
         return self.flow_measure
+
+    def get_queue_measure(self):
+        try:
+            return self.queue_measure/self.queue_frame_count
+        except:
+            print("Error! queue length calculation not called")
+            return 0
+
+    def get_count_measure(self):
+        return self.count_measure
 
     def lane_reset(self):
         self.flow_measure = 0
