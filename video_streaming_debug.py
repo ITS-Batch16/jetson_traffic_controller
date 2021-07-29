@@ -1,26 +1,23 @@
 import time, cv2
 import numpy as np
 from video_streamer.streaming import RTSPstreamer as streamer
-import video_streamer.cam_config as cfg
-
 
 '''Use each debug function to debug the system functionwise'''
 
 
-def stream_cameras():
+def stream_cameras(active_cameras):
     '''Debuggginf function for receiving Ras/pi streams'''
-    CameraSet = streamer()
-    active_cameras = ['NORTH','NORTH','NORTH','NORTH']#length should be less than 4
-    num_cameras = len(active_cameras)
-    CameraSet.open(active_cameras )
 
-    SHOW_TIME = 600
+    video_streamer = streamer(active_cameras)
+    num_cameras = len(active_cameras)
+    video_streamer.open()
+    SHOW_TIME = 300
     t0 = time.time()
     images = [None] * num_cameras
     img_shape = None
 
     while (time.time() - t0 < SHOW_TIME):
-        frames = CameraSet.get_frames()
+        frames = video_streamer.get_frames()
 
         for i in range(num_cameras):
             frame = frames[i]
@@ -41,9 +38,14 @@ def stream_cameras():
             cv2.waitKey(1)
     
     cv2.destroyAllWindows()
-    CameraSet.close()
+    video_streamer.close()
+    del video_streamer
+    #time.sleep(1)
 
 
 if __name__ == '__main__':
     '''Run the required debugging function below.'''
-    stream_cameras()
+    # stream_cameras(["NORTH","SOUTH"])
+    stream_cameras(["COL","KES","MAH","PIL"])
+    # stream_cameras(["SOUTH"])
+    # stream_cameras(["COL"])
