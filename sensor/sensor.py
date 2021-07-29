@@ -76,6 +76,9 @@ class WeightedFlowSensor(threading.Thread):
             if self.mode == "FLOW":
                 images = [self.after_frame(frame=images[i], boxes=boxes[i], way_n=cam_names[i]) for i in range(batch_size)]
                 
+                for i in range(batch_size):
+                    cv2.putText(images[i], cam_names[i], (10, 50), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255, 0), 3)
+                
                 if self.config.SHOW_TRACKING:
                     '''Displaying the simultaneous tracking of 4 streams'''
 
@@ -97,7 +100,7 @@ class WeightedFlowSensor(threading.Thread):
                     cv2.waitKey(1)
             
             elif self.mode == "QUEUE":
-                pass
+                pass 
 
     def after_frame(self, frame,boxes, way_n):
         config=self.config
@@ -134,11 +137,21 @@ class WeightedFlowSensor(threading.Thread):
             for lane in config.LANES[way_n].values():
 
                 if lane.is_leaving_via(xmax=track.bbox_last.xmax, x_center=x_center, config=config):
-                    #print(config.LABELS[track.label_i])
+                    print("%s entered from %s"%(config.LABELS[track.label_i],way_n))
                     lane.flow_measure += config.PCU[track.label_i]
                     lane.count_measure[config.LABELS[track.label_i]] += 1
 
-    #def update_queue_measure:
+    # def update_queue_measure((self, frame,boxes, way_n)):
+    #     for bbox in boxes:
+    #         x_center = (track.bbox.xmax + track.bbox.xmin)/2
+    #         for lane in config.LANES[way_n].values():
+    #             if lane.is_on_lane(x_center):
+    #                 lane.queue_meauser+= config.PCU[bbox.label]
+
+
+
+
+
 
     def close(self):
         self.stop_flag = 1

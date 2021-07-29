@@ -193,6 +193,7 @@ class CNN(object):
         img_rz_batch = np.zeros((len(x_list),dim), dtype=np.float16)
         for j, x in enumerate(x_list):
             img_rz = x / 255.0
+            img_rz = cv2.resize(img_rz, (config.W_NN_INPUT, config.H_NN_INPUT))
             img_rz = img_rz[:, :, ::-1]
             img_rz = np.expand_dims(img_rz, 0)
             img_rz = np.transpose(img_rz, (0,3, 1, 2))

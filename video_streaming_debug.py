@@ -11,7 +11,7 @@ def stream_cameras(active_cameras):
     video_streamer = streamer(active_cameras)
     num_cameras = len(active_cameras)
     video_streamer.open()
-    SHOW_TIME = 10
+    SHOW_TIME = 300
     t0 = time.time()
     images = [None] * num_cameras
     img_shape = None
@@ -40,12 +40,12 @@ def stream_cameras(active_cameras):
     cv2.destroyAllWindows()
     video_streamer.close()
     del video_streamer
-    time.sleep(5)
+    #time.sleep(1)
 
 
 if __name__ == '__main__':
     '''Run the required debugging function below.'''
     # stream_cameras(["NORTH","SOUTH"])
-    #stream_cameras(["EAST","SOUTH","WEST"])
+    stream_cameras(["COL","KES","MAH","PIL"])
     # stream_cameras(["SOUTH"])
-    stream_cameras(["EAST","SOUTH","WEST","NORTH"])
+    # stream_cameras(["COL"])

@@ -12,7 +12,8 @@ __version__ = "1.0.0"
 __maintainer__ = "Abarajthan G"
 __email__ = "abarajithan07@gmail.com"
 __status__ = "Research"
-
+from sympy import Point,Line
+import math
 
 class Config():
     def __init__(self):
@@ -217,20 +218,22 @@ class Config():
         self.X_MAX_END = int(self.W_SHOW * self.X_MAX_END_RATIO)
 
 
-class Line:
-    def __init__(self, p1, p2):
-        self.set_m_c(p1, p2)
+# class Line:
+#     def __init__(self, p1, p2):
+#         self.set_m_c(p1, p2)
 
-    def is_less(self, p):
-        x, y = p
-        return x <= self.m * y + self.c
+#     def is_less(self, p):
+#         x, y = p
+#         return x <= self.m * y + self.c
 
-    def set_m_c(self, p1, p2):
-        self.points = p1, p2
-        x1, y1 = p1
-        x2, y2 = p2
-        self.m = (x1-x2)/(y1-y2)  # delta(y)/delta(x)
-        self.c = x1 - self.m*y1
+#     def set_m_c(self, p1, p2):
+#         self.points = p1, p2
+#         x1, y1 = p1
+#         x2, y2 = p2
+#         self.m = (x1-x2)/(y1-y2)  # delta(y)/delta(x)
+#         self.c = x1 - self.m*y1
+
+
 
 
 class Lane:
@@ -255,6 +258,7 @@ class Lane:
         self.phase = phase
         self.adjustment = adjustment
         self.x_limits = min(x_limits), max(x_limits)
+        self.lane_boundries = None
         self.flow_measure = 0
         self.queue_measure = 0
         self.count_measure = dict(zip(['motorbike', 'three-wheeler', 'car', 'truck'],[0,0,0,0]))
@@ -268,6 +272,21 @@ class Lane:
             if self.x_limits[0] <= x_center <= self.x_limits[1]:
                 return True
                 # print('lane', lane.name)
+
+    # def is_on_lane(self,point):
+    #     l1 = Line(self.lane_boundries[0])
+    #     l2 = Line(self.lane_boundries[1])
+    #     p = Point(point)
+    #     pl1 = l1.perpendicular_line(p)
+    #     pl2 = l2.perpendicular_line(p)
+
+    #     angle = float(pl1.smallest_angle_between(pl2))
+
+    #     if angle < math.pi*0.5:
+    #         return True
+    #     else:
+    #         return False
+
     
     def get_flow_measure(self):
         return self.flow_measure
